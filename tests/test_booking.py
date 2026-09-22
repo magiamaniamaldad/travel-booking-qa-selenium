@@ -8,6 +8,7 @@ from pages.booking_page import BookingPage
 
 @pytest.fixture
 def driver():
+    """Launch a headless Chrome browser for each test."""
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--window-size=1920,1080")
@@ -19,6 +20,7 @@ def driver():
 
 @pytest.fixture
 def booking_page(driver):
+    """Open the local TripFlow booking application."""
     page = BookingPage(driver)
 
     app_path = Path(__file__).resolve().parents[1] / "app" / "index.html"
@@ -27,22 +29,24 @@ def booking_page(driver):
     return page
 
 
-def test_search_valid_trip(booking_page):
+def test_valid_booking_displays_correct_route_and_price(booking_page):
     booking_page.search_trip(
         origin="Buenos Aires",
         destination="Mar del Plata",
-        date="10-11-2026",
-        passengers=1,
+        date="2026-11-10",
+        passengers=2,
     )
 
     assert booking_page.results_are_displayed()
+    assert booking_page.get_route() == "Buenos Aires → Mar del Plata"
+    assert booking_page.get_price() == "Total: ARS 64000"
 
 
 def test_same_origin_and_destination_is_rejected(booking_page):
     booking_page.search_trip(
         origin="Buenos Aires",
         destination="Buenos Aires",
-        date="10-11-2026",
+        date="2026-11-10",
         passengers=1,
     )
 
@@ -53,24 +57,27 @@ def test_same_origin_and_destination_is_rejected(booking_page):
 
 
 @pytest.mark.parametrize(
-    "origin,destination,passengers",
+    "origin,destination,passengers,expected_price",
     [
-        ("Buenos Aires", "Mar del Plata", 1),
-        ("Buenos Aires", "Rosario", 2),
-        ("Cordoba", "Mar del Plata", 4),
+        ("Buenos Aires", "Mar del Plata", 1, "Total: ARS 32000"),
+        ("Buenos Aires", "Rosario", 2, "Total: ARS 64000"),
+        ("Cordoba", "Mar del Plata", 4, "Total: ARS 128000"),
     ],
 )
-def test_multiple_valid_booking_scenarios(
+def test_multiple_booking_scenarios(
     booking_page,
     origin,
     destination,
     passengers,
+    expected_price,
 ):
     booking_page.search_trip(
         origin=origin,
         destination=destination,
-        date="10-11-2026",
+        date="2026-11-10",
         passengers=passengers,
     )
 
     assert booking_page.results_are_displayed()
+    assert booking_page.get_route() == f"{origin} → {destination}"
+    assert booking_page.get_price() == expected_price

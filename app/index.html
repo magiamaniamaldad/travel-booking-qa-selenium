@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripFlow - Travel Booking</title>
+</head>
+
+<body>
+    <main>
+        <h1>TripFlow</h1>
+        <p>Search and compare available trips.</p>
+
+        <form id="booking-form">
+            <label for="origin">Origin</label>
+            <select id="origin">
+                <option value="">Select origin</option>
+                <option>Buenos Aires</option>
+                <option>Mar del Plata</option>
+                <option>Rosario</option>
+                <option>Cordoba</option>
+            </select>
+
+            <label for="destination">Destination</label>
+            <select id="destination">
+                <option value="">Select destination</option>
+                <option>Buenos Aires</option>
+                <option>Mar del Plata</option>
+                <option>Rosario</option>
+                <option>Cordoba</option>
+            </select>
+
+            <label for="departure-date">Departure date</label>
+            <input id="departure-date" type="date">
+
+            <label for="passengers">Passengers</label>
+            <select id="passengers">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <button type="submit">Search trips</button>
+        </form>
+
+        <p data-testid="booking-error" hidden></p>
+
+        <section data-testid="search-results" hidden>
+            <h2>Available trip</h2>
+            <p id="route"></p>
+            <p id="price"></p>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById("booking-form");
+        const error = document.querySelector('[data-testid="booking-error"]');
+        const results = document.querySelector('[data-testid="search-results"]');
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            const origin = document.getElementById("origin").value;
+            const destination = document.getElementById("destination").value;
+            const date = document.getElementById("departure-date").value;
+            const passengers = Number(
+                document.getElementById("passengers").value
+            );
+
+            error.hidden = true;
+            results.hidden = true;
+
+            if (!origin || !destination || !date) {
+                error.textContent =
+                    "Origin, destination and departure date are required.";
+                error.hidden = false;
+                return;
+            }
+
+            if (origin === destination) {
+                error.textContent =
+                    "Origin and destination must be different.";
+                error.hidden = false;
+                return;
+            }
+
+            const basePrice = 32000;
+            const totalPrice = basePrice * passengers;
+
+            document.getElementById("route").textContent =
+                `${origin} → ${destination}`;
+
+            document.getElementById("price").textContent =
+                `Total: ARS ${totalPrice}`;
+
+            results.hidden = false;
+        });
+    </script>
+</body>
+</html>

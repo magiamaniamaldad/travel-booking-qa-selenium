@@ -12,8 +12,11 @@ class BookingPage(BasePage):
     DEPARTURE_DATE = (By.ID, "departure-date")
     PASSENGERS = (By.ID, "passengers")
     SEARCH_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
+
     RESULTS = (By.CSS_SELECTOR, "[data-testid='search-results']")
     ERROR_MESSAGE = (By.CSS_SELECTOR, "[data-testid='booking-error']")
+    ROUTE = (By.ID, "route")
+    PRICE = (By.ID, "price")
 
     def select_origin(self, origin):
         Select(self.find(self.ORIGIN)).select_by_visible_text(origin)
@@ -39,3 +42,9 @@ class BookingPage(BasePage):
 
     def get_error_message(self):
         return self.get_text(self.ERROR_MESSAGE)
+
+    def get_route(self):
+        return self.get_text(self.ROUTE)
+
+    def get_price(self):
+        return self.get_text(self.PRICE)
